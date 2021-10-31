@@ -32,7 +32,7 @@ try
 }
 catch (Exception $exception)
 {
-    echo 'Could not connect to the database';
+    echo 'Could not connect to the database. Check you connection details are correct';
     exit(1);
 }
 
