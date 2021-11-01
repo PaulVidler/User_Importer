@@ -5,6 +5,7 @@
 // - Install dependancies: 'composer install'
 // - Make the file executable: "cdmod +x ./user_upload"
 // - Run "php user_upload.php" 
+// - -h command needs to be updated as it;'s the help in any regular conesole app - updated to 'd'
 
 // - For foobar.php - from terminal: "php foorbar.php"
 
