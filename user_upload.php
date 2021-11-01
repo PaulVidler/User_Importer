@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Helper\Table;
 
 require 'vendor/autoload.php';
 
@@ -56,7 +57,7 @@ $app->register('import')
     ->addOption('dbHost', 'd', InputOption::VALUE_REQUIRED, 'Set the server name for your local DB instance')
     ->addOption('file', 'f', InputOption::VALUE_REQUIRED, 'Set the relative path/name of the file you wish to use (ie: "./users.csv"')
     ->addArgument('dry_run', InputArgument::OPTIONAL, 'Display a dry run of data and present into a table on screen')
-    ->addOption('create_table', 'c', InputOption::VALUE_OPTIONAL, 'Create a "users" table on your local DB instance')
+    ->addArgument('create_table', InputArgument::OPTIONAL, 'Create a "users" table on your local DB instance')
     ->setCode(function(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('hello');
@@ -72,42 +73,60 @@ $app->register('import')
         echo $filePath. "\n";
 
         if ($input->getArgument('dry_run')){
-            showDryRun($filePath);
+            showDryRun($output, $filePath);
         }
 
     });
 
 $app->run();
 
-function showDryRun($path){
+function showDryRun(OutputInterface $output, $filePath){
     $data = [];
 
     // open the file
-    $f = fopen($path, 'r');
+    $f = fopen($filePath, 'r');
 
     if ($f === false) {
-        die('Cannot open the file, check your path is correct ' . $path);
+        die('Cannot open the file, check your path is correct ' . $filePath);
     }
 
+    $count = 1;
     // read each line in CSV file at a time
     while (($row = fgetcsv($f)) !== false) {
-        $data[] = $row;
-    }
+        // skip header
+        if ($count === 1){
+            $count++;
+            continue;
+        } 
+        else {
+            // $data[] = $row;
+            // $count++;
+            if(CheckEmail($row[2]) == '' ){
+                $newArr = [CleanSpecialNameStringChars($row[0]), CleanSpecialNameStringChars($row[1]), "** Email did not pass validation **"];
+            } else{
+                $newArr = [CleanSpecialNameStringChars($row[0]), CleanSpecialNameStringChars($row[1]), CheckEmail($row[2])];
+            }
+            
+            array_push($data, $newArr);
+        }
 
-    foreach($data as $row){
-        echo CleanSpecialNameStringChars($row[0]) . ', '. CleanSpecialNameStringChars($row[1]) . ', Legit email: '. $row[2] . ' : '. CheckEmail($row[2]) ."\n";
     }
+    $table = new Table($output);
+
+    $table->setHeaders(['Name', 'Surname', 'Email'])
+            ->setRows($data)
+            ->render();
 
     // close the file
     fclose($f);
 }
 
 
-// clean up odd chars from Name strings - Requires feedback on code review for edge cases
+// clean up odd chars and whitespace from Name strings - Requires feedback on code review for edge cases
 function CleanSpecialNameStringChars($str)
 {
     $res = preg_replace('/[0-9\@\.\;\" "\!]+/', '', $str);
-    return ucfirst(strtolower($res));
+    return trim(ucfirst(strtolower($res)));
 }
 
 // Check email - Requires feedback on code review for edge cases
