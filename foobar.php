@@ -9,16 +9,16 @@
 
 for ($x =1; $x <= 100; $x++){
     
-    if($x % 3 == 0 && $x % 5 == 0){
+    if($x % 15 == 0){
         echo $x. ": foobar\n";
         continue;
     } 
 
-    if($x % 3 == 0){
+    else if($x % 3 == 0){
         echo $x. ": foo\n";
     }
 
-    if($x % 5 == 0){
+    else if($x % 5 == 0){
         echo $x. ": bar\n";
     }
     
