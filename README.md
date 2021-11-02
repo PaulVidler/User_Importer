@@ -27,13 +27,24 @@ create_table - To create the table locally on your DB instance
 
 --file=./users.csv
 
-## An example command to enter credentials to DB, supply the file path, create the table, then display a dry run of immport data to screen.
+## An example command to enter credentials to DB, supply the file path, create the table, then display a dry run of import data to screen.
 
 "php user_upload.php import -u myUsername -p myPassword -d localhost --file=./users.csv create_table dry_run"
+
+## An example command to enter credentials to DB, supply the file path, then import data and present on screen.
+
+"php user_upload.php import -u myUsername -p myPassword -d localhost --file=./users.csv create_table"
 
 ## Features
 
 - Validation of all email addresses
 - Removing whitespace and odd characters from names
-- First letter of each name will be capitalised
+- First letter of each name/surname will be capitalised
+- Will not allow duplicate emails
+
+## Known issues
+- Requires refactoring and a more OO approach
+- No tests
+- Email validation will not allow 'open.edu.au' as a domain
+- Requires better help docs and user experience
 
